@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JSONView renders snapshots 1`] = `
+<ContextProvider
+  value={
+    Object {
+      "json": null,
+      "jsonPath": "",
+    }
+  }
+>
+  <JSONView />
+</ContextProvider>
+`;
