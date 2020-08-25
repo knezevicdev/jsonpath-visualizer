@@ -18,7 +18,7 @@ import { Wrapper, Name, ValueWrapper } from './Variable.css';
 
 type VariableProps = {
   name: string;
-  value: unknown;
+  value: unknown | null | undefined;
   type: string;
 };
 
@@ -61,7 +61,7 @@ const Variable: FunctionComponent<VariableProps> = ({ type, value, name }) => {
 
 Variable.propTypes = {
   name: PropTypes.string.isRequired,
-  value: PropTypes.any.isRequired,
+  value: PropTypes.any,
   type: PropTypes.string.isRequired,
 };
 

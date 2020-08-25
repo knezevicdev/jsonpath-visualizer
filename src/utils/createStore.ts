@@ -1,4 +1,4 @@
-export type TJson = null | Record<string, unknown>;
+export type TJson = null | Record<string, unknown> | any[];
 
 export const createStore = () => {
   return {
