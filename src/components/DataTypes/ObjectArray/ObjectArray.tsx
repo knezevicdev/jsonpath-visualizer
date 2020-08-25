@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import { toType } from 'utils/helpers';
@@ -7,7 +7,7 @@ import { CollapsedIcon, ExpandedIcon } from 'components/ToggleIcons/ToggleIcons'
 import Ellipsis from 'components/Ellipsis/Ellipsis';
 import Variable from 'components/Variable/Variable';
 
-import { Wrapper, Name, IconWrapper } from './ObjectArray.css';
+import { Wrapper, Name, IconWrapper, ContentWrapper } from './ObjectArray.css';
 import { ARRAY_GROUP_LIMIT } from 'utils/constants';
 import ArrayGroup from 'components/ArrayGroup/ArrayGroup';
 
@@ -24,13 +24,15 @@ type ObjectProps = {
 
 const ObjectArray: FunctionComponent<ObjectProps> = ({ depth, src, type, name, indexOffset, expanded }) => {
   const [collapsed, setCollapsed] = useState(!!expanded);
+  const elements = useRef<JSX.Element[]>([]);
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
 
   const renderContent = () => {
-    const elements: unknown[] = [];
+    if (elements.current.length) return elements.current;
+
     const keys = Object.keys(src);
 
     console.log(keys);
@@ -45,9 +47,9 @@ const ObjectArray: FunctionComponent<ObjectProps> = ({ depth, src, type, name, i
       const name = type === 'array' && indexOffset ? String(Number(variable.name || '') + indexOffset) : variable.name;
 
       if (variable.type === 'array' && (variable.value as any[])?.length > ARRAY_GROUP_LIMIT) {
-        elements.push(<ArrayGroup key={variable.name} array={variable.value as any[]} name={name} />);
+        elements.current.push(<ArrayGroup key={variable.name} array={variable.value as any[]} name={name} />);
       } else if (variable.type === 'object' || variable.type === 'array') {
-        elements.push(
+        elements.current.push(
           <ObjectArray
             key={variable.name}
             depth={depth + DEPTH_INCREMENT}
@@ -57,11 +59,11 @@ const ObjectArray: FunctionComponent<ObjectProps> = ({ depth, src, type, name, i
           />,
         );
       } else {
-        elements.push(<Variable key={variable.name} name={name} value={variable.value} type={variable.type} />);
+        elements.current.push(<Variable key={variable.name} name={name} value={variable.value} type={variable.type} />);
       }
     });
 
-    return elements;
+    return elements.current;
   };
 
   return (
@@ -70,9 +72,10 @@ const ObjectArray: FunctionComponent<ObjectProps> = ({ depth, src, type, name, i
         <IconWrapper onClick={toggleCollapsed}>{collapsed ? <ExpandedIcon /> : <CollapsedIcon />}</IconWrapper>{' '}
         {depth > 0 && <Name>{name}: </Name>} <span>{type === 'array' ? '[' : '{'}</span>
       </span>
-      {collapsed ? (
-        <div>{renderContent()}</div>
-      ) : (
+      {(elements.current.length || collapsed) && (
+        <ContentWrapper collapsed={collapsed}>{renderContent()}</ContentWrapper>
+      )}
+      {!collapsed && (
         <div onClick={toggleCollapsed}>
           <Ellipsis />
         </div>
@@ -105,4 +108,4 @@ class JsonVariable {
   }
 }
 
-export default ObjectArray;
+export default React.memo(ObjectArray);

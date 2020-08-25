@@ -1,11 +1,11 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
+import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { chunk as _chunk } from 'lodash';
 
 import { JsonObject } from 'components/DataTypes';
 import { ARRAY_GROUP_LIMIT } from 'utils/constants';
 
-import { Wrapper, Name, IconWrapper } from './ArrayGroup.css';
+import { Wrapper, Name, IconWrapper, ContentWrapper } from './ArrayGroup.css';
 import { CollapsedIcon, ExpandedIcon } from 'components/ToggleIcons/ToggleIcons';
 import Ellipsis from 'components/Ellipsis/Ellipsis';
 
@@ -17,6 +17,7 @@ type ArrayGroupProps = {
 const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [chunks, setChunks] = useState<any[][]>([[]]);
+  const elements = useRef<JSX.Element[]>([]);
 
   useEffect(() => {
     setChunks(_chunk(array, ARRAY_GROUP_LIMIT));
@@ -35,7 +36,9 @@ const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name }) => {
   };
 
   const renderContent = (): JSX.Element[] => {
-    return chunks.map((chunk: any[], index: number) => (
+    if (elements.current.length) return elements.current;
+
+    elements.current = chunks.map((chunk: any[], index: number) => (
       <JsonObject
         key={index}
         depth={1}
@@ -46,6 +49,8 @@ const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name }) => {
         expanded={false}
       />
     ));
+
+    return elements.current;
   };
 
   return (
@@ -54,9 +59,10 @@ const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name }) => {
         <IconWrapper onClick={toggleCollapsed}>{collapsed ? <ExpandedIcon /> : <CollapsedIcon />}</IconWrapper>{' '}
         {name && name.length && <Name>{name}: </Name>} <span>{'['}</span>
       </span>
-      {collapsed ? (
-        <div>{renderContent()}</div>
-      ) : (
+      {(elements.current.length || collapsed) && (
+        <ContentWrapper collapsed={collapsed}>{renderContent()}</ContentWrapper>
+      )}
+      {!collapsed && (
         <div onClick={toggleCollapsed}>
           <Ellipsis />
         </div>
@@ -75,4 +81,4 @@ ArrayGroup.defaultProps = {
   name: '',
 };
 
-export default ArrayGroup;
+export default React.memo(ArrayGroup);

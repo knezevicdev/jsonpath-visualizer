@@ -30,3 +30,15 @@ export const Name = styled.span`
 export const IconWrapper = styled.span`
   cursor: pointer;
 `;
+
+type ContentWrapperProps = {
+  collapsed: boolean;
+};
+
+export const ContentWrapper = styled.div<ContentWrapperProps>`
+  ${({ collapsed }) =>
+    !collapsed &&
+    css`
+      display: none;
+    `}
+`;
