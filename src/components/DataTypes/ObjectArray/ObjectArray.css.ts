@@ -27,6 +27,18 @@ export const Name = styled.span`
   }
 `;
 
+interface ValueWrapperProps {
+  collapsed: boolean;
+}
+
+export const ValueWrapper = styled.span<ValueWrapperProps>`
+  ${({ collapsed }) =>
+    !collapsed &&
+    css`
+      display: flex;
+    `}
+`;
+
 export const IconWrapper = styled.span`
   cursor: pointer;
 `;

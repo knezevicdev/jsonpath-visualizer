@@ -1,8 +1,8 @@
 import React from 'react';
-import { parseWithPointers } from '@stoplight/json';
 import { useToasts } from 'react-toast-notifications';
 
 import { useStore } from 'utils/store';
+import { toType } from 'utils/helpers';
 
 const FileSelector = () => {
   const store = useStore();
@@ -17,12 +17,13 @@ const FileSelector = () => {
   const onReaderLoad = (event: ProgressEvent<FileReader>): void => {
     const jsonString = event.target?.result;
 
-    if (jsonString && typeof jsonString === 'string') {
-      const result = parseWithPointers(jsonString);
+    if (toType(jsonString) === 'string') {
+      try {
+        const result = JSON.parse(jsonString as string);
+        store.json = result;
 
-      if (result.diagnostics.length === 0) {
-        store.json = result.data;
-      } else {
+        console.log(result);
+      } catch (e) {
         addToast('Please select valid JSON file', { appearance: 'error' });
       }
     }

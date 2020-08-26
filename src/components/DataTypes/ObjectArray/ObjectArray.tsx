@@ -7,24 +7,25 @@ import { CollapsedIcon, ExpandedIcon } from 'components/ToggleIcons/ToggleIcons'
 import Ellipsis from 'components/Ellipsis/Ellipsis';
 import Variable from 'components/Variable/Variable';
 
-import { Wrapper, Name, IconWrapper, ContentWrapper } from './ObjectArray.css';
+import { Wrapper, Name, IconWrapper, ContentWrapper, ValueWrapper } from './ObjectArray.css';
 import { ARRAY_GROUP_LIMIT } from 'utils/constants';
 import ArrayGroup from 'components/ArrayGroup/ArrayGroup';
-
-const DEPTH_INCREMENT = 1;
+import { observer } from 'mobx-react';
+import { useStore } from 'utils/store';
 
 type ObjectProps = {
-  depth: number;
   name?: string;
   src: any;
   type: string;
   indexOffset?: number;
   expanded?: boolean;
+  pointer: string;
 };
 
-const ObjectArray: FunctionComponent<ObjectProps> = ({ depth, src, type, name, indexOffset, expanded }) => {
+const ObjectArray: FunctionComponent<ObjectProps> = ({ src, type, name, indexOffset, expanded, pointer }) => {
   const [collapsed, setCollapsed] = useState(!!expanded);
   const elements = useRef<JSX.Element[]>([]);
+  const store = useStore();
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
@@ -38,28 +39,41 @@ const ObjectArray: FunctionComponent<ObjectProps> = ({ depth, src, type, name, i
     console.log(keys);
 
     keys.forEach((key) => {
-      const variable = new JsonVariable(key, src[key]);
+      const variable = new JsonVariable(key, src[key], indexOffset, type, pointer);
 
       if (!src.hasOwnProperty(key)) {
         return;
       }
 
-      const name = type === 'array' && indexOffset ? String(Number(variable.name || '') + indexOffset) : variable.name;
-
       if (variable.type === 'array' && (variable.value as any[])?.length > ARRAY_GROUP_LIMIT) {
-        elements.current.push(<ArrayGroup key={variable.name} array={variable.value as any[]} name={name} />);
+        elements.current.push(
+          <ArrayGroup
+            key={variable.name}
+            array={variable.value as any[]}
+            name={variable.name}
+            pointer={variable.pointer}
+          />,
+        );
       } else if (variable.type === 'object' || variable.type === 'array') {
         elements.current.push(
-          <ObjectArray
+          <JSONObject
             key={variable.name}
-            depth={depth + DEPTH_INCREMENT}
-            name={name}
+            name={variable.name}
             src={variable.value}
             type={variable.type}
+            pointer={variable.pointer}
           />,
         );
       } else {
-        elements.current.push(<Variable key={variable.name} name={name} value={variable.value} type={variable.type} />);
+        elements.current.push(
+          <Variable
+            key={variable.name}
+            name={variable.name}
+            value={variable.value}
+            type={variable.type}
+            pointer={variable.pointer}
+          />,
+        );
       }
     });
 
@@ -70,28 +84,31 @@ const ObjectArray: FunctionComponent<ObjectProps> = ({ depth, src, type, name, i
     <Wrapper collapsed={collapsed}>
       <span>
         <IconWrapper onClick={toggleCollapsed}>{collapsed ? <ExpandedIcon /> : <CollapsedIcon />}</IconWrapper>{' '}
-        {depth > 0 && <Name>{name}: </Name>} <span>{type === 'array' ? '[' : '{'}</span>
+        {name?.length && <Name>{name}: </Name>}
       </span>
-      {(elements.current.length || collapsed) && (
-        <ContentWrapper collapsed={collapsed}>{renderContent()}</ContentWrapper>
-      )}
-      {!collapsed && (
-        <div onClick={toggleCollapsed}>
-          <Ellipsis />
-        </div>
-      )}
-      <span>{type === 'array' ? ']' : '}'}</span>
+      <ValueWrapper collapsed={collapsed} data-matched={store.matched.includes(pointer)}>
+        <span>{type === 'array' ? '[' : '{'}</span>
+        {(elements.current.length || collapsed) && (
+          <ContentWrapper collapsed={collapsed}>{renderContent()}</ContentWrapper>
+        )}
+        {!collapsed && (
+          <div onClick={toggleCollapsed}>
+            <Ellipsis />
+          </div>
+        )}
+        <span>{type === 'array' ? ']' : '}'}</span>
+      </ValueWrapper>
     </Wrapper>
   );
 };
 
 ObjectArray.propTypes = {
-  depth: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   src: PropTypes.any.isRequired,
   type: PropTypes.string.isRequired,
   indexOffset: PropTypes.number.isRequired,
   expanded: PropTypes.bool,
+  pointer: PropTypes.string.isRequired,
 };
 
 ObjectArray.defaultProps = {
@@ -102,10 +119,23 @@ ObjectArray.defaultProps = {
 
 class JsonVariable {
   public type: string;
+  public pointer: string;
 
-  constructor(public name: string, public value: unknown) {
+  constructor(
+    public name: string,
+    public value: unknown,
+    indexOffset: number | undefined,
+    type: string,
+    pointer: string,
+  ) {
     this.type = toType(value);
+    if (type === 'array' && indexOffset) {
+      this.name = String(Number(name || '0') + indexOffset);
+    }
+    this.pointer = `${pointer}/${this.name}`;
   }
 }
 
-export default React.memo(ObjectArray);
+const JSONObject = observer(ObjectArray);
+
+export default JSONObject;

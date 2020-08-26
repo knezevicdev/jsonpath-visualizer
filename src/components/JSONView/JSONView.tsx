@@ -16,14 +16,14 @@ const JSONView: React.FC = () => {
   if ((store.json as any[])?.length > ARRAY_GROUP_LIMIT) {
     return (
       <div>
-        <ArrayGroup array={store.json as any[]} />
+        <ArrayGroup array={store.json as any[]} pointer="" />
       </div>
     );
   }
 
   return (
     <div>
-      <JsonObject depth={0} name="" src={store.json} type={toType(store.json)} />
+      <JsonObject name="" src={store.json} type={toType(store.json)} pointer="" />
     </div>
   );
 };

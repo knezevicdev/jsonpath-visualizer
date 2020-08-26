@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import {
@@ -15,14 +15,19 @@ import {
 } from 'components/DataTypes';
 
 import { Wrapper, Name, ValueWrapper } from './Variable.css';
+import { useStore } from 'utils/store';
+import { observer } from 'mobx-react';
 
 type VariableProps = {
   name: string;
   value: unknown | null | undefined;
   type: string;
+  pointer: string;
 };
 
-const Variable: FunctionComponent<VariableProps> = ({ type, value, name }) => {
+const Variable: FunctionComponent<VariableProps> = ({ type, value, name, pointer }) => {
+  const store = useStore();
+
   const getValue = () => {
     switch (type) {
       case 'string':
@@ -54,7 +59,7 @@ const Variable: FunctionComponent<VariableProps> = ({ type, value, name }) => {
   return (
     <Wrapper>
       <Name>{name}: </Name>
-      <ValueWrapper>{getValue()}</ValueWrapper>
+      <ValueWrapper data-matched={store.matched.includes(pointer)}>{getValue()}</ValueWrapper>
     </Wrapper>
   );
 };
@@ -63,6 +68,7 @@ Variable.propTypes = {
   name: PropTypes.string.isRequired,
   value: PropTypes.any,
   type: PropTypes.string.isRequired,
+  pointer: PropTypes.string.isRequired,
 };
 
-export default Variable;
+export default observer(Variable);

@@ -5,19 +5,22 @@ import { chunk as _chunk } from 'lodash';
 import { JsonObject } from 'components/DataTypes';
 import { ARRAY_GROUP_LIMIT } from 'utils/constants';
 
-import { Wrapper, Name, IconWrapper, ContentWrapper } from './ArrayGroup.css';
+import { Wrapper, Name, IconWrapper, ContentWrapper, ValueWrapper } from './ArrayGroup.css';
 import { CollapsedIcon, ExpandedIcon } from 'components/ToggleIcons/ToggleIcons';
 import Ellipsis from 'components/Ellipsis/Ellipsis';
+import { useStore } from 'utils/store';
 
 type ArrayGroupProps = {
   array: any[];
   name?: string;
+  pointer: string;
 };
 
-const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name }) => {
+const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name, pointer }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [chunks, setChunks] = useState<any[][]>([[]]);
   const elements = useRef<JSX.Element[]>([]);
+  const store = useStore();
 
   useEffect(() => {
     setChunks(_chunk(array, ARRAY_GROUP_LIMIT));
@@ -41,12 +44,12 @@ const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name }) => {
     elements.current = chunks.map((chunk: any[], index: number) => (
       <JsonObject
         key={index}
-        depth={1}
         src={chunk}
         type="array"
         indexOffset={index * ARRAY_GROUP_LIMIT}
         name={generateName(index)}
         expanded={false}
+        pointer={pointer}
       />
     ));
 
@@ -57,17 +60,20 @@ const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name }) => {
     <Wrapper collapsed={collapsed}>
       <span>
         <IconWrapper onClick={toggleCollapsed}>{collapsed ? <ExpandedIcon /> : <CollapsedIcon />}</IconWrapper>{' '}
-        {name && name.length && <Name>{name}: </Name>} <span>{'['}</span>
+        {name && name.length && <Name>{name}: </Name>}
       </span>
-      {(elements.current.length || collapsed) && (
-        <ContentWrapper collapsed={collapsed}>{renderContent()}</ContentWrapper>
-      )}
-      {!collapsed && (
-        <div onClick={toggleCollapsed}>
-          <Ellipsis />
-        </div>
-      )}
-      <span>{']'}</span>
+      <ValueWrapper collapsed={collapsed} data-matched={store.matched.includes(pointer)}>
+        <span>{'['}</span>
+        {(elements.current.length || collapsed) && (
+          <ContentWrapper collapsed={collapsed}>{renderContent()}</ContentWrapper>
+        )}
+        {!collapsed && (
+          <div onClick={toggleCollapsed}>
+            <Ellipsis />
+          </div>
+        )}
+        <span>{']'}</span>
+      </ValueWrapper>
     </Wrapper>
   );
 };
@@ -75,10 +81,11 @@ const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name }) => {
 ArrayGroup.propTypes = {
   array: PropTypes.array.isRequired,
   name: PropTypes.string,
+  pointer: PropTypes.string.isRequired,
 };
 
 ArrayGroup.defaultProps = {
   name: '',
 };
 
-export default React.memo(ArrayGroup);
+export default ArrayGroup;
