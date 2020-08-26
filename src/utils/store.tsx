@@ -40,7 +40,7 @@ export const withStore = (WrappedComponent: ComponentType): React.FC => {
   return StoreHOC;
 };
 
-export const useStore = () => {
+export const useStore = (): TStore => {
   const store = React.useContext(storeContext);
   if (!store) {
     throw new Error('useStore must be used within a StoreProvider.');

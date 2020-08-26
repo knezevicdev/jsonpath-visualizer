@@ -20,5 +20,6 @@ module.exports = {
   ],
   rules: {
     'react/prop-types': [2, { ignore: ['children'] }],
+    '@typescript-eslint/no-explicit-any': 0,
   },
 };

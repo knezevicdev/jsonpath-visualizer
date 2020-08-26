@@ -11,14 +11,14 @@ import Ellipsis from 'components/Ellipsis/Ellipsis';
 import { useStore } from 'utils/store';
 
 type ArrayGroupProps = {
-  array: any[];
+  array: unknown[];
   name?: string;
   pointer: string;
 };
 
 const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name, pointer }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const [chunks, setChunks] = useState<any[][]>([[]]);
+  const [chunks, setChunks] = useState<unknown[][]>([[]]);
   const elements = useRef<JSX.Element[]>([]);
   const store = useStore();
 
@@ -41,7 +41,7 @@ const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name, pointer }
   const renderContent = (): JSX.Element[] => {
     if (elements.current.length) return elements.current;
 
-    elements.current = chunks.map((chunk: any[], index: number) => (
+    elements.current = chunks.map((chunk: unknown[], index: number) => (
       <JsonObject
         key={index}
         src={chunk}
