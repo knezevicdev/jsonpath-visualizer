@@ -4,27 +4,25 @@ import { observer } from 'mobx-react';
 
 import ArrayGroup from 'components/ArrayGroup/ArrayGroup';
 
-import { JsonObject } from 'components/DataTypes';
+import ObjectArray from 'components/ObjectArray/ObjectArray';
 import { toType } from 'utils/helpers';
 import { ARRAY_GROUP_LIMIT } from 'utils/constants';
+
+import { Wrapper } from './JSONView.css';
 
 const JSONView: React.FC = () => {
   const store = useStore();
 
-  if (!store.json) return null;
-
-  if ((store.json as any[])?.length > ARRAY_GROUP_LIMIT) {
-    return (
-      <div>
-        <ArrayGroup array={store.json as any[]} pointer="" />
-      </div>
-    );
-  }
+  if (!store.json) return <Wrapper />;
 
   return (
-    <div>
-      <JsonObject name="" src={store.json} type={toType(store.json)} pointer="" />
-    </div>
+    <Wrapper>
+      {(store.json as any[])?.length > ARRAY_GROUP_LIMIT ? (
+        <ArrayGroup array={store.json as any[]} pointer="" />
+      ) : (
+        <ObjectArray name="" src={store.json} type={toType(store.json)} pointer="" />
+      )}
+    </Wrapper>
   );
 };
 

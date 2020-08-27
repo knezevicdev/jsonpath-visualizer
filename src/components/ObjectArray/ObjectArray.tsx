@@ -3,33 +3,23 @@ import PropTypes from 'prop-types';
 
 import { toType } from 'utils/helpers';
 
-import { CollapsedIcon, ExpandedIcon } from 'components/ToggleIcons/ToggleIcons';
-import Ellipsis from 'components/Ellipsis/Ellipsis';
 import Variable from 'components/Variable/Variable';
-
-import { Wrapper, Name, IconWrapper, ContentWrapper, ValueWrapper } from './ObjectArray.css';
-import { ARRAY_GROUP_LIMIT } from 'utils/constants';
+import Collapse from 'components/Collapse/Collapse';
 import ArrayGroup from 'components/ArrayGroup/ArrayGroup';
-import { observer } from 'mobx-react';
-import { useStore } from 'utils/store';
+
+import { ARRAY_GROUP_LIMIT } from 'utils/constants';
 
 type ObjectProps = {
   name?: string;
   src: any;
   type: string;
   indexOffset?: number;
-  expanded?: boolean;
+  opened?: boolean;
   pointer: string;
 };
 
-const ObjectArray: FunctionComponent<ObjectProps> = ({ src, type, name, indexOffset, expanded, pointer }) => {
-  const [collapsed, setCollapsed] = useState(!!expanded);
+const ObjectArray: FunctionComponent<ObjectProps> = ({ src, type, name, indexOffset, opened, pointer }) => {
   const elements = useRef<JSX.Element[]>([]);
-  const store = useStore();
-
-  const toggleCollapsed = () => {
-    setCollapsed(!collapsed);
-  };
 
   const renderContent = () => {
     if (elements.current.length) return elements.current;
@@ -56,7 +46,7 @@ const ObjectArray: FunctionComponent<ObjectProps> = ({ src, type, name, indexOff
         );
       } else if (variable.type === 'object' || variable.type === 'array') {
         elements.current.push(
-          <JSONObject
+          <ObjectArray
             key={variable.name}
             name={variable.name}
             src={variable.value}
@@ -81,24 +71,13 @@ const ObjectArray: FunctionComponent<ObjectProps> = ({ src, type, name, indexOff
   };
 
   return (
-    <Wrapper collapsed={collapsed}>
-      <span>
-        <IconWrapper onClick={toggleCollapsed}>{collapsed ? <ExpandedIcon /> : <CollapsedIcon />}</IconWrapper>{' '}
-        {name?.length && <Name>{name}: </Name>}
-      </span>
-      <ValueWrapper collapsed={collapsed} data-matched={store.matched.includes(pointer)}>
-        <span>{type === 'array' ? '[' : '{'}</span>
-        {(elements.current.length || collapsed) && (
-          <ContentWrapper collapsed={collapsed}>{renderContent()}</ContentWrapper>
-        )}
-        {!collapsed && (
-          <div onClick={toggleCollapsed}>
-            <Ellipsis />
-          </div>
-        )}
-        <span>{type === 'array' ? ']' : '}'}</span>
-      </ValueWrapper>
-    </Wrapper>
+    <Collapse
+      opened={!!opened}
+      isArray={type === 'array'}
+      name={name || ''}
+      pointer={pointer}
+      renderContent={renderContent}
+    />
   );
 };
 
@@ -107,14 +86,14 @@ ObjectArray.propTypes = {
   src: PropTypes.any.isRequired,
   type: PropTypes.string.isRequired,
   indexOffset: PropTypes.number.isRequired,
-  expanded: PropTypes.bool,
+  opened: PropTypes.bool,
   pointer: PropTypes.string.isRequired,
 };
 
 ObjectArray.defaultProps = {
   name: '',
   indexOffset: 0,
-  expanded: true,
+  opened: true,
 };
 
 class JsonVariable {
@@ -136,6 +115,4 @@ class JsonVariable {
   }
 }
 
-const JSONObject = observer(ObjectArray);
-
-export default JSONObject;
+export default ObjectArray;

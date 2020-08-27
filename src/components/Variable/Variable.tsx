@@ -1,20 +1,9 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import {
-  JsonBoolean,
-  JsonFloat,
-  JsonFunction,
-  JsonInteger,
-  JsonNan,
-  JsonNull,
-  JsonRegexp,
-  JsonString,
-  JsonTime,
-  JsonUndefined,
-} from 'components/DataTypes';
+import { Wrapper, FieldName, FieldValue, FieldValueProps } from 'styled/components';
+import { fieldValueProps } from 'styled/helpers';
 
-import { Wrapper, Name, ValueWrapper } from './Variable.css';
 import { useStore } from 'utils/store';
 import { observer } from 'mobx-react';
 
@@ -27,39 +16,54 @@ type VariableProps = {
 
 const Variable: FunctionComponent<VariableProps> = ({ type, value, name, pointer }) => {
   const store = useStore();
+  const [props, setProps] = useState<FieldValueProps>(fieldValueProps('orange'));
 
-  const getValue = () => {
+  useEffect(() => {
     switch (type) {
       case 'string':
-        return <JsonString value={value as string} />;
+        setProps(fieldValueProps('orange'));
+        break;
       case 'integer':
-        return <JsonInteger value={value as number} />;
+        setProps(fieldValueProps('brown'));
+        break;
       case 'float':
-        return <JsonFloat value={value as number} />;
+        setProps(fieldValueProps('green'));
+        break;
       case 'boolean':
-        return <JsonBoolean value={value as boolean} />;
+        setProps(fieldValueProps('purple'));
+        break;
       case 'function':
-        return <JsonFunction value={value as (...args: any[]) => any} />;
+        setProps(fieldValueProps('orange'));
+        break;
       case 'null':
-        return <JsonNull />;
+        setProps(fieldValueProps('rajah', true));
+        break;
       case 'nan':
-        return <JsonNan />;
+        setProps(fieldValueProps('pink', true));
+        break;
       case 'undefined':
-        return <JsonUndefined />;
+        setProps(fieldValueProps('white', true));
+        break;
       case 'date':
-        return <JsonTime value={value as Date} />;
+        setProps(fieldValueProps('aqua'));
+        break;
       case 'regexp':
-        return <JsonRegexp value={value as RegExp} />;
+        setProps(fieldValueProps('aqua'));
+        break;
       default:
         // catch-all for types that weren't anticipated
-        return <div>{JSON.stringify(value)}</div>;
+        setProps(fieldValueProps('orange'));
     }
-  };
+  }, [type]);
 
   return (
     <Wrapper>
-      <Name>{name}: </Name>
-      <ValueWrapper data-matched={store.matched.includes(pointer)}>{getValue()}</ValueWrapper>
+      <FieldName>{name}:&nbsp;</FieldName>
+      <FieldValue data-matched={store.matched.includes(pointer)} {...props}>
+        {type === 'string' && '"'}
+        {String(value)}
+        {type === 'string' && '"'}
+      </FieldValue>
     </Wrapper>
   );
 };

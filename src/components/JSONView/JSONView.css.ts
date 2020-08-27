@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
 export const Wrapper = styled.div`
-  display: inline-block;
-  color: red;
+  width: 100%;
+  height: 90vh;
+  background-color: #272822;
+  overflow: auto;
 `;

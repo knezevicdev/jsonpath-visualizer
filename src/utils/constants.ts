@@ -1,1 +1,1 @@
-export const ARRAY_GROUP_LIMIT = 50;
+export const ARRAY_GROUP_LIMIT = 100;
