@@ -74,8 +74,9 @@
       "enzyme-to-json/serializer"
     ],
     "moduleNameMapper": {
-      "^components/(.*)": "<rootDir>/src/components/$1",
-      "^utils/(.*)": "<rootDir>/src/utils/$1"
+      "^components": "<rootDir>/src/components",
+      "^utils/(.*)": "<rootDir>/src/utils/$1",
+      "^styled/(.*)": "<rootDir>/src/styled/$1"
     }
   }
 }

@@ -1,16 +1,18 @@
 import React from 'react';
 import { ToastProvider } from 'react-toast-notifications';
 
-import FileSelector from 'components/FileSelector/FileSelector';
-import JSONView from 'components/JSONView/JSONView';
-import JSONPathInput from 'components/JSONPathInput/JSONPathInput';
 import { withStore } from 'utils/store';
+import { FileSelector, JSONView, JSONPathInput } from 'components';
+
+import { TopWrapper } from './App.css';
 
 const App: React.FC = () => {
   return (
     <ToastProvider autoDismiss>
-      <FileSelector />
-      <JSONPathInput />
+      <TopWrapper>
+        <FileSelector />
+        <JSONPathInput />
+      </TopWrapper>
       <JSONView />
     </ToastProvider>
   );

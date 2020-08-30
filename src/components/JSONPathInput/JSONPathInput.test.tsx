@@ -3,13 +3,13 @@ import { shallow } from 'enzyme';
 
 import { StoreProvider } from 'utils/store';
 
-import FileSelector from './FileSelector';
+import JSONPathInput from './JSONPathInput';
 
-describe('FileSelector', () => {
+describe('JSONPathInput', () => {
   it('renders snapshots', () => {
     const wrapper = shallow(
       <StoreProvider>
-        <FileSelector />
+        <JSONPathInput />
       </StoreProvider>,
     );
     expect(wrapper).toMatchSnapshot();

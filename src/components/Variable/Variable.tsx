@@ -1,21 +1,21 @@
 import React, { FunctionComponent, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { Wrapper, FieldName, FieldValue, FieldValueProps } from 'styled/components';
-import { fieldValueProps } from 'styled/helpers';
-
 import { useStore } from 'utils/store';
+import { fieldValueProps } from 'styled/helpers';
+import { Wrapper, FieldName, FieldValue, FieldValueProps } from 'styled/components';
+
 import { observer } from 'mobx-react';
 
 type VariableProps = {
   name: string;
   value: unknown | null | undefined;
   type: string;
-  pointer: string;
+  path: string;
 };
 
-const Variable: FunctionComponent<VariableProps> = ({ type, value, name, pointer }) => {
-  const store = useStore();
+const Variable: FunctionComponent<VariableProps> = ({ type, value, name, path }) => {
+  const { [path]: matched } = useStore();
   const [props, setProps] = useState<FieldValueProps>(fieldValueProps('orange'));
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const Variable: FunctionComponent<VariableProps> = ({ type, value, name, pointer
   return (
     <Wrapper>
       <FieldName>{name}:&nbsp;</FieldName>
-      <FieldValue data-matched={store.matched.includes(pointer)} {...props}>
+      <FieldValue data-matched={matched} {...props}>
         {type === 'string' && '"'}
         {String(value)}
         {type === 'string' && '"'}
@@ -72,7 +72,7 @@ Variable.propTypes = {
   name: PropTypes.string.isRequired,
   value: PropTypes.any,
   type: PropTypes.string.isRequired,
-  pointer: PropTypes.string.isRequired,
+  path: PropTypes.string.isRequired,
 };
 
 export default observer(Variable);

@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react';
 import PropTypes from 'prop-types';
 
 import colors from 'styled/colors';
+
 import { Svg } from './ToggleIcons.css';
 
 type ToggleIconProps = {

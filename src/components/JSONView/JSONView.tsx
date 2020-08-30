@@ -1,26 +1,24 @@
 import React from 'react';
-import { useStore } from 'utils/store';
 import { observer } from 'mobx-react';
 
-import ArrayGroup from 'components/ArrayGroup/ArrayGroup';
-
-import ObjectArray from 'components/ObjectArray/ObjectArray';
+import { useStore } from 'utils/store';
 import { toType } from 'utils/helpers';
 import { ARRAY_GROUP_LIMIT } from 'utils/constants';
+import { ArrayGroup, ObjectArray } from 'components';
 
 import { Wrapper } from './JSONView.css';
 
 const JSONView: React.FC = () => {
-  const store = useStore();
+  const { json, jsonUploadTime } = useStore();
 
-  if (!store.json) return <Wrapper />;
+  if (!json) return <Wrapper />;
 
   return (
     <Wrapper>
-      {(store.json as any[])?.length > ARRAY_GROUP_LIMIT ? (
-        <ArrayGroup array={store.json as any[]} pointer="" />
+      {(json as any[])?.length > ARRAY_GROUP_LIMIT ? (
+        <ArrayGroup array={json as any[]} path="" key={jsonUploadTime} />
       ) : (
-        <ObjectArray name="" src={store.json} type={toType(store.json)} pointer="" />
+        <ObjectArray name="" src={json} type={toType(json)} path="" key={jsonUploadTime} />
       )}
     </Wrapper>
   );

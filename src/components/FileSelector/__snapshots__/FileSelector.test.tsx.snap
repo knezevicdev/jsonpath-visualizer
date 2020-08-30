@@ -6,6 +6,8 @@ exports[`FileSelector renders snapshots 1`] = `
     Object {
       "json": null,
       "jsonPath": "",
+      "jsonUploadTime": 0,
+      "matchedPaths": Array [],
     }
   }
 >

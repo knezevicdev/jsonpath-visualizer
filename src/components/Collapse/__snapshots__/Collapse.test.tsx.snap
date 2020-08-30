@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`JSONView renders snapshots 1`] = `
+exports[`Collapse renders snapshots 1`] = `
 <ContextProvider
   value={
     Object {
@@ -11,6 +11,11 @@ exports[`JSONView renders snapshots 1`] = `
     }
   }
 >
-  <JSONView />
+  <Collapse
+    name=""
+    opened={true}
+    path=""
+    renderContent={[Function]}
+  />
 </ContextProvider>
 `;

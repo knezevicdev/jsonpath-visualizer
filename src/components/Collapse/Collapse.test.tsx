@@ -3,13 +3,13 @@ import { shallow } from 'enzyme';
 
 import { StoreProvider } from 'utils/store';
 
-import FileSelector from './FileSelector';
+import Collapse from './Collapse';
 
-describe('FileSelector', () => {
+describe('Collapse', () => {
   it('renders snapshots', () => {
     const wrapper = shallow(
       <StoreProvider>
-        <FileSelector />
+        <Collapse opened={true} name="" path="" renderContent={() => []} />
       </StoreProvider>,
     );
     expect(wrapper).toMatchSnapshot();

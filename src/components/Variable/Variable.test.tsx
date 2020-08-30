@@ -3,13 +3,13 @@ import { shallow } from 'enzyme';
 
 import { StoreProvider } from 'utils/store';
 
-import FileSelector from './FileSelector';
+import Variable from './Variable';
 
-describe('FileSelector', () => {
+describe('Variable', () => {
   it('renders snapshots', () => {
     const wrapper = shallow(
       <StoreProvider>
-        <FileSelector />
+        <Variable name="" path="" value="" type="string" />
       </StoreProvider>,
     );
     expect(wrapper).toMatchSnapshot();

@@ -1,13 +1,9 @@
-import React, { FunctionComponent, useState, useRef } from 'react';
+import React, { FunctionComponent, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import { toType } from 'utils/helpers';
-
-import Variable from 'components/Variable/Variable';
-import Collapse from 'components/Collapse/Collapse';
-import ArrayGroup from 'components/ArrayGroup/ArrayGroup';
-
+import { Variable, Collapse, ArrayGroup } from 'components';
 import { ARRAY_GROUP_LIMIT } from 'utils/constants';
+import { toType } from 'utils/helpers';
 
 type ObjectProps = {
   name?: string;
@@ -15,10 +11,10 @@ type ObjectProps = {
   type: string;
   indexOffset?: number;
   opened?: boolean;
-  pointer: string;
+  path: string;
 };
 
-const ObjectArray: FunctionComponent<ObjectProps> = ({ src, type, name, indexOffset, opened, pointer }) => {
+const ObjectArray: FunctionComponent<ObjectProps> = ({ src, type, name, indexOffset, opened, path }) => {
   const elements = useRef<JSX.Element[]>([]);
 
   const renderContent = () => {
@@ -26,10 +22,8 @@ const ObjectArray: FunctionComponent<ObjectProps> = ({ src, type, name, indexOff
 
     const keys = Object.keys(src);
 
-    console.log(keys);
-
     keys.forEach((key) => {
-      const variable = new JsonVariable(key, src[key], indexOffset, type, pointer);
+      const variable = new JsonVariable(key, src[key], indexOffset, type, path);
 
       if (!src.hasOwnProperty(key)) {
         return;
@@ -37,31 +31,26 @@ const ObjectArray: FunctionComponent<ObjectProps> = ({ src, type, name, indexOff
 
       if (variable.type === 'array' && (variable.value as any[])?.length > ARRAY_GROUP_LIMIT) {
         elements.current.push(
-          <ArrayGroup
-            key={variable.name}
-            array={variable.value as any[]}
-            name={variable.name}
-            pointer={variable.pointer}
-          />,
+          <ArrayGroup key={variable.path} array={variable.value as any[]} name={variable.name} path={variable.path} />,
         );
       } else if (variable.type === 'object' || variable.type === 'array') {
         elements.current.push(
           <ObjectArray
-            key={variable.name}
+            key={variable.path}
             name={variable.name}
             src={variable.value}
             type={variable.type}
-            pointer={variable.pointer}
+            path={variable.path}
           />,
         );
       } else {
         elements.current.push(
           <Variable
-            key={variable.name}
+            key={variable.path}
             name={variable.name}
             value={variable.value}
             type={variable.type}
-            pointer={variable.pointer}
+            path={variable.path}
           />,
         );
       }
@@ -75,7 +64,7 @@ const ObjectArray: FunctionComponent<ObjectProps> = ({ src, type, name, indexOff
       opened={!!opened}
       isArray={type === 'array'}
       name={name || ''}
-      pointer={pointer}
+      path={path}
       renderContent={renderContent}
     />
   );
@@ -87,7 +76,7 @@ ObjectArray.propTypes = {
   type: PropTypes.string.isRequired,
   indexOffset: PropTypes.number.isRequired,
   opened: PropTypes.bool,
-  pointer: PropTypes.string.isRequired,
+  path: PropTypes.string.isRequired,
 };
 
 ObjectArray.defaultProps = {
@@ -98,20 +87,19 @@ ObjectArray.defaultProps = {
 
 class JsonVariable {
   public type: string;
-  public pointer: string;
+  public path: string;
 
-  constructor(
-    public name: string,
-    public value: unknown,
-    indexOffset: number | undefined,
-    type: string,
-    pointer: string,
-  ) {
+  constructor(public name: string, public value: unknown, indexOffset: number | undefined, type: string, path: string) {
     this.type = toType(value);
     if (type === 'array' && indexOffset) {
       this.name = String(Number(name || '0') + indexOffset);
     }
-    this.pointer = `${pointer}/${this.name}`;
+
+    if (path.length === 0) {
+      this.path = this.name;
+    } else {
+      this.path = `${path}.${this.name}`;
+    }
   }
 }
 

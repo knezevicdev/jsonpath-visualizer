@@ -1,19 +1,17 @@
-import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
+import React, { FunctionComponent, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { chunk as _chunk } from 'lodash';
 
 import { ARRAY_GROUP_LIMIT } from 'utils/constants';
-
-import ObjectArray from 'components/ObjectArray/ObjectArray';
-import Collapse from 'components/Collapse/Collapse';
+import { ObjectArray, Collapse } from 'components';
 
 type ArrayGroupProps = {
   array: unknown[];
   name?: string;
-  pointer: string;
+  path: string;
 };
 
-const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name, pointer }) => {
+const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name, path }) => {
   const chunks = useRef<unknown[][]>(_chunk(array, ARRAY_GROUP_LIMIT));
   const elements = useRef<JSX.Element[]>([]);
 
@@ -30,26 +28,26 @@ const ArrayGroup: FunctionComponent<ArrayGroupProps> = ({ array, name, pointer }
 
     elements.current = chunks.current.map((chunk: unknown[], index: number) => (
       <ObjectArray
-        key={`${pointer}/chunk/${index}`}
+        key={`${path}/chunk/${index}`}
         src={chunk}
         type="array"
         indexOffset={index * ARRAY_GROUP_LIMIT}
         name={generateName(index)}
         opened={false}
-        pointer={pointer}
+        path={path}
       />
     ));
 
     return elements.current;
   };
 
-  return <Collapse opened isArray name={name || ''} pointer={pointer} renderContent={renderContent} />;
+  return <Collapse opened isArray name={name || ''} path={path} renderContent={renderContent} />;
 };
 
 ArrayGroup.propTypes = {
   array: PropTypes.array.isRequired,
   name: PropTypes.string,
-  pointer: PropTypes.string.isRequired,
+  path: PropTypes.string.isRequired,
 };
 
 ArrayGroup.defaultProps = {

@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ArrayGroup renders snapshots 1`] = `
+<Collapse
+  isArray={true}
+  name=""
+  opened={true}
+  path=""
+  renderContent={[Function]}
+/>
+`;

@@ -1,8 +1,9 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import JSONView from './JSONView';
 import { StoreProvider } from 'utils/store';
+
+import JSONView from './JSONView';
 
 describe('JSONView', () => {
   it('renders snapshots', () => {

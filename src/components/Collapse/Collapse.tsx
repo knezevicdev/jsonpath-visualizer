@@ -1,25 +1,25 @@
 import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useStore } from 'utils/store';
+import { observer } from 'mobx-react';
 
-import { ExpandedIcon, CollapsedIcon } from 'components/ToggleIcons/ToggleIcons';
+import { useStore } from 'utils/store';
+import { FieldName } from 'styled/components';
+import { ExpandedIcon, CollapsedIcon } from 'components';
 
 import { Wrapper, Value, Content, Bracket, Ellipsis } from './Collapse.css';
-import { FieldName } from 'styled/components';
-import { observer } from 'mobx-react';
 
 type CollapseProps = {
   opened: boolean;
   name: string;
-  pointer: string;
+  path: string;
   isArray?: boolean;
   renderContent: () => JSX.Element[];
 };
 
-const Collapse: FunctionComponent<CollapseProps> = ({ opened, name, pointer, isArray, renderContent }) => {
+const Collapse: FunctionComponent<CollapseProps> = ({ opened, name, path, isArray, renderContent }) => {
   const [isOpened, setIsOpened] = useState(opened);
   const alreadyOpened = useRef(false);
-  const store = useStore();
+  const { [path]: matched } = useStore();
 
   useEffect(() => {
     if (opened) {
@@ -41,10 +41,10 @@ const Collapse: FunctionComponent<CollapseProps> = ({ opened, name, pointer, isA
     <Wrapper opened={isOpened}>
       <span onClick={toggleOpened}>
         {isOpened ? <ExpandedIcon /> : <CollapsedIcon />}&nbsp;
-        {name && name.length && <FieldName>{name}: </FieldName>}
+        {name && name.length && <FieldName>{name}:&nbsp;</FieldName>}
       </span>
-      <Value opened={isOpened} data-matched={store.matched.includes(pointer)}>
-        <Bracket>{isArray ? '[' : '{'}</Bracket>&nbsp;
+      <Value opened={isOpened} data-matched={matched}>
+        <Bracket>{isArray ? '[' : '{'}</Bracket>
         {(alreadyOpened.current || isOpened) && <Content opened={isOpened}>{renderContent()}</Content>}
         {!isOpened && (
           <div onClick={toggleOpened}>
@@ -60,7 +60,7 @@ const Collapse: FunctionComponent<CollapseProps> = ({ opened, name, pointer, isA
 Collapse.propTypes = {
   opened: PropTypes.bool.isRequired,
   name: PropTypes.string.isRequired,
-  pointer: PropTypes.string.isRequired,
+  path: PropTypes.string.isRequired,
   isArray: PropTypes.bool,
   renderContent: PropTypes.func.isRequired,
 };
